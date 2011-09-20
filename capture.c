@@ -243,6 +243,7 @@ void process_data() { //buffer_init() has been called
 	}
 	break;
       case SYNCAV:
+	//fprintf(stderr,"%02x",nc);
 	if( nc & (unsigned char)0x10 ){ //EAV
 	  state = HSYNC;
 	}
@@ -273,7 +274,7 @@ void process_data() { //buffer_init() has been called
       case REMAINDER:
 	if( state == VBLANK || vblank_found < 20 ){//  || state == REMAINDER){
 	  line_remaining -= skip_buffer( line_remaining );
-	  //fprintf( stderr, "vblank\n");
+	  //fprintf( stderr, "vblank_found=%d\n" , vblank_found);
 	}
 	else{
 	  line_remaining -= write_buffer( line_remaining, frame, active_line_count, field );
