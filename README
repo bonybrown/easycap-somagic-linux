@@ -1,0 +1,53 @@
+README file for easycap-somagic-linux
+
+The aim of project is to make useful under linux the SoMagic variant of the EasyCap video capture device.
+On insertion, the device has the USB id of 1c88:0007
+After what looks to be a firmware initialisation, the USB id changes to 1c88:003c
+It is at this point that the device exposes data endpoints and video can be captured.
+
+What DOES work:
+* Device initalisation
+* Capture of PAL video input as a UYVY stream
+
+What DOES NOT work at the moment:
+* No sound capture
+* Only configures capture for PAL TV system
+
+
+Files:
+/UsbSnoop_logs  - captured log files from a Windows machine running the drivers provided with the device
+/tools - a perl script to process the captured logs and create code to replay the logged events
+/include - some files required to compile the per script output, for isochronous transfers.
+/generated - C programs generated from several of the logs
+
+init1.c - first initialisation program to run against the device as 1c88:0007
+init2.c - second initialisation, to run against 1c88:003c
+capture.c - a program which should capture a composite PAL input signal
+               and output 720 * 576 line UYVY data frames at 25 per second.
+
+Requires:
+libusb AND libusb-1.0
+mplayer can be used to decode and display the UYVY frames (see below)
+
+Compilation:
+gcc init1.c -o init1 -lusb
+gcc init2.c -o init2 -lusb
+gcc capture.c -o capture -lusb-1.0
+
+Usage:
+* insert EasyCap device
+* sudo ./init1 1c88 0007
+* sudo ./init2 1c88 003c
+* sudo ./capture 1c88 003c  | mplayer -  -demuxer rawvideo -rawvideo "w=720:h=576:format=uyvy:fps=25"
+You should now be able to see the captured video.
+Note: init1 and init2 only need to executed once per device power-up.
+
+TODO:
+* LOTS!
+* Combining the 3 programs into one.
+* MUCH refactoring and clean up of code
+* Adding additional command line options to capture.c ( such as number of frames to generate / output format, etc)
+* And in decreasing likelyhood of me doing them (but feel free to step up, anyone else)...
+** PAL/NTSC config
+** Audio capture
+** Creation of a proper v4l2 driver would be nice
